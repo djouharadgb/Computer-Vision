@@ -1,9 +1,14 @@
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+import os
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
 shrink=0.2
-img1 = cv2.imread('img8.jpg',0)  #queryimage # left image
-img2 = cv2.imread('img7.jpg',0) #trainimage # right image
+img1 = cv2.imread(os.path.join(script_dir, 'img8.jpg'), 0)  #queryimage # left image
+img2 = cv2.imread(os.path.join(script_dir, 'img7.jpg'), 0)  #trainimage # right image
+if img1 is None or img2 is None:
+    raise FileNotFoundError("Could not load img8.jpg or img7.jpg")
 img1 = cv2.resize(img1, (0,0), fx=shrink, fy=shrink, interpolation=cv2.INTER_CUBIC)
 img2 = cv2.resize(img2, (0,0), fx=shrink, fy=shrink, interpolation=cv2.INTER_CUBIC)
 sift = cv2.SIFT.create()

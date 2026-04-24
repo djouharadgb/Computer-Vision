@@ -1,14 +1,17 @@
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
-
+import os
 
 # Reference: https://opencv24-python-tutorials.readthedocs.io/en/latest/py_tutorials/py_calib3d/py_epipolar_geometry/py_epipolar_geometry.html
 
+script_dir = os.path.dirname(os.path.abspath(__file__))
 shrink=0.2
-img1 = cv2.imread('img7.jpg',0)  #queryimage # left image
-img2 = cv2.imread('img8.jpg',0) #trainimage # right image
-img1 = cv2.resize(img1, (0,0), fx=shrink, fy=shrink, interpolation=cv2.INTER_CUBIC)
+img1 = cv2.imread(os.path.join(script_dir, 'Djo_art/Right.jpg'), 0)  #queryimage # left image
+img2 = cv2.imread(os.path.join(script_dir, 'Djo_art/Left.jpg'), 0)  #trainimage # right image
+if img1 is None or img2 is None:
+    raise FileNotFoundError("Could not load Right.jpg or Left.jpg")
+img1 = cv2.resize(img1, (0,0), fx=shrink, fy=shrink, interpolation=cv2.INTER_CUBIC)# preserves edge details better than INTER_AREA
 img2 = cv2.resize(img2, (0,0), fx=shrink, fy=shrink, interpolation=cv2.INTER_CUBIC)
 sift = cv2.SIFT.create()
 
@@ -25,10 +28,10 @@ pts2 = []
 
 # ratio test as per Lowe's paper
 for m, n in matches:
-	if m.distance < 0.65 * n.distance:
-	    good.append([m])
-	    pts2.append(kp2[m.trainIdx].pt)
-	    pts1.append(kp1[m.queryIdx].pt)
+    if m.distance < 0.3 * n.distance:
+        good.append([m])
+        pts2.append(kp2[m.trainIdx].pt) #we extract the locations (coordinates) of matched keypoints in both images and store them in pts1 and pts2.
+        pts1.append(kp1[m.queryIdx].pt)
 
 img3 = cv2.drawMatchesKnn(img1,kp1,img2,kp2,good[:], None, flags=2)
 cv2.imshow("img3", img3)
@@ -37,7 +40,7 @@ cv2.destroyAllWindows()
 pts1 = np.int32(pts1)
 pts2 = np.int32(pts2)
 
-F, mask = cv2.findFundamentalMat(pts1,pts2,cv2.FM_LMEDS)
+F, mask = cv2.findFundamentalMat(pts1,pts2,cv2.FM_LMEDS) #least median of squares method to compute the fundamental matrix F. The function also returns a mask that indicates which point correspondences are inliers (consistent with the estimated fundamental matrix) and which are outliers.
 
 # We select only inlier points
 pts1 = pts1[mask.ravel()==1]

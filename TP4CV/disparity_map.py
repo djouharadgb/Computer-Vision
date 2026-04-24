@@ -14,7 +14,6 @@ img1 = cv.resize(img1, (0,0), fx=shrink, fy=shrink, interpolation=cv.INTER_CUBIC
 img2 = cv.resize(img2, (0,0), fx=shrink, fy=shrink, interpolation=cv.INTER_CUBIC)
 
 
-# ------------------------------------------------------------
 # PREPROCESSING
 
 # Compare unprocessed images
